@@ -11,7 +11,7 @@ from scipy.optimize import minimize
 import statsmodels.tsa.api as smt
 import statsmodels.api as sm
 
-from tqdm import tqdm_notebook
+# from tqdm import tqdm_notebook
 
 from itertools import product
 
@@ -20,4 +20,6 @@ def mean_absolute_percentage_error(y_true, y_pred):
 
 path = '/home/miguel/Python_Projects/datasets/stock_prices_sample.csv'
 data = pd.read_csv(path, index_col=['DATE'], parse_dates=['DATE'])
-data.head(10)
+print(data.head(10))
+print(data.shape)
+print(data.dtypes)
