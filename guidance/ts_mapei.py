@@ -173,34 +173,28 @@ s = 5
 #Create a list with all possible combinations of parameters
 parameters = product(ps, qs, Ps, Qs)
 parameters_list = list(parameters)
+len(parameters_list)
+
+#Create a list with all possible combinations of parameters
+parameters = product(ps, qs, Ps, Qs)
+parameters_list = list(parameters)
 print('Number of parameters:', len(parameters_list))
 
-def optimize_SARIMA(parameters_list, d, D, s, data):
-    """
-    Return dataframe with parameters and corresponding AIC.
-    
-    parameters_list - list with (p, q, P, Q) tuples
-    d - integration order
-    D - seasonal integration order
-    s - length of season
-    data - dataframe with a 'CLOSE' column
-    """
-    
-    # --- PREPROCESSING ---
+def optimize_SARIMA(parameters_list, d, D, s, data):    
     data = data.sort_index()
     data.index = pd.DatetimeIndex(data.index)
     try:
         data = data.asfreq(pd.infer_freq(data.index))
     except:
-        pass  # If can't infer, just proceed without frequency
-    
+        pass
+
     results = []
     best_aic = float('inf')
     
-    for param in tqdm(parameters_list):
+    for param in tqdm(parameters_list, desc="Fitting SARIMAs"):
         try:
             model = sm.tsa.statespace.SARIMAX(
-                data.CLOSE, 
+                data.CLOSE,
                 order=(param[0], d, param[1]),
                 seasonal_order=(param[2], D, param[3], s)
             ).fit(disp=False)
@@ -216,7 +210,7 @@ def optimize_SARIMA(parameters_list, d, D, s, data):
             best_param = param
         
         results.append([param, model.aic])
-        
+    
     result_table = pd.DataFrame(results)
     result_table.columns = ['parameters', 'aic']
     result_table = result_table.sort_values(by='aic', ascending=True).reset_index(drop=True)
@@ -224,14 +218,12 @@ def optimize_SARIMA(parameters_list, d, D, s, data):
     return result_table
 
 
+result_table = optimize_SARIMA(parameters_list, d, D, s)
 
-result_table = optimize_SARIMA(parameters_list, d, D, s, data)
-
-HBox(children=(IntProgress(value=0, max=625), HTML(value='')))
-
-#Set parameters that give the lowest AIC (Akaike Information Criteria)
-
+# Extract parameters from first row that give the lowest AIC (Akaike Information Criteria)
 p, q, P, Q = result_table.parameters[0]
+print("p, d, q x P, D, Q, s:", p, d, q, P, D, Q, s)
+# Model: SARIMAX(0, 1, 0)x(2, 1, 4, 5)
 best_model = sm.tsa.statespace.SARIMAX(data.CLOSE, order=(p, d, q),
                                        seasonal_order=(P, D, Q, s)).fit(disp=-1)
 print(best_model.summary())
