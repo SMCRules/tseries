@@ -17,3 +17,7 @@ from itertools import product
 
 def mean_absolute_percentage_error(y_true, y_pred):
     return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
+
+path = '/home/miguel/Python_Projects/datasets/stock_prices_sample.csv'
+data = pd.read_csv(path, index_col=['DATE'], parse_dates=['DATE'])
+data.head(10)
