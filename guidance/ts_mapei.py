@@ -232,10 +232,8 @@ HBox(children=(IntProgress(value=0, max=625), HTML(value='')))
 #Set parameters that give the lowest AIC (Akaike Information Criteria)
 
 p, q, P, Q = result_table.parameters[0]
-
 best_model = sm.tsa.statespace.SARIMAX(data.CLOSE, order=(p, d, q),
                                        seasonal_order=(P, D, Q, s)).fit(disp=-1)
-
 print(best_model.summary())
 
 def plot_SARIMA(series, model, n_steps):
@@ -265,7 +263,7 @@ def plot_SARIMA(series, model, n_steps):
     plt.plot(data, label='actual')
     plt.legend()
     plt.grid(True)
-    plt.show();
+    plt.show()
     
 # plot_SARIMA(data, best_model, 5)
 print(best_model.predict(start=data.CLOSE.shape[0], end=data.CLOSE.shape[0] + 5))
